@@ -1,7 +1,7 @@
 
 .anchor
 .DS_Store
-!target/deploy/exec_test-keypair.so
+!target/deploy/exec_test-keypair.json
 target/
 
 **/*.rs.bk

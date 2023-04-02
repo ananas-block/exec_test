@@ -17,3 +17,7 @@ default = []
 
 [dependencies]
 anchor-lang = "0.26.0"
+solana-program = {path="../../../michal_solana/solana/sdk/program", version="1.16.0"}
+ark-bn254 = "0.4.0"
+ark-ff = "0.4.0"
+getrandom = { version = "0.2.2", features = ["custom"] }
