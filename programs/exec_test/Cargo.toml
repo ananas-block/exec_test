@@ -16,4 +16,8 @@ cpi = ["no-entrypoint"]
 default = []
 
 [dependencies]
-anchor-lang = "0.26.0"
+anchor-lang = "0.28.0"
+groth16-solana ="0.0.1"
+ark-ec ="0.3.0"
+ark-ff ="0.3.0"
+ark-bn254 ="0.3.0"
