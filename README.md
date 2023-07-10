@@ -11,5 +11,6 @@ Error: ELF error: ELF error: Unresolved symbol (sol_alt_bn128_group_op) at instr
 
 ```anchor deploy```
 
+or
 
 ```solana program deploy target/deploy/exec_test.so```
