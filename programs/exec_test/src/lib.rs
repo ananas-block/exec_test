@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 use solana_program::poseidon::hashv;
-declare_id!("DzLsmqhzHC3U5pFS1vbUXZFRuTeTC9ZTjNcc3STRX5Va");
+declare_id!("Esqmi51Gc2EGie1b3uGqZyqY86rakzCLk1gv4D9x2Lwp");
 
 pub struct PublicInput {
     pub input1: [[u8; 32]; 3],
@@ -19,16 +19,26 @@ pub mod exec_test {
     }
 }
 fn execute_poseidon() -> Result<()> {
-    let mut inputs = Vec::new();
-    let value = [vec![0u8; 31], vec![1u8]].concat();
-    inputs.push(value.as_slice());
-    Fr::from_be_bytes_mod_order(inputs[0]);
-    let hash = hashv(&[&value[..]]).unwrap();
-    // for i in 1..16 {
-    //     inputs.push(value.as_slice());
-    //     let hash = poseidon_hash(&inputs[..]).unwrap();
-    //     assert_eq!(TEST_CASES[i - 1], hash.to_bytes());
-    // }
+    msg!("execute_poseidon");
+    for i in 0..50 {
+        let mut inputs = Vec::new();
+        let value = [vec![0u8; 31], vec![1u8]].concat();
+        // inputs.push(value.as_slice());
+        // Fr::from_be_bytes_mod_order(inputs[0]);
+        let hash = hashv(&[&value[..]]).unwrap();
+        msg!("here");
+        for i in 1..13 {
+            msg!("i {}", i);
+            inputs.push(value.as_slice());
+            let hash = hashv(inputs.as_slice()).unwrap();
+            // assert_eq!(TEST_CASES[i - 1], hash.to_bytes());
+        }
+        inputs.push(value.as_slice());
+        let hash = hashv(inputs.as_slice());
+        msg!("{:?}", hash);
+        assert!(hash.is_err());
+    }
+
     Ok(())
 }
 #[derive(Accounts)]

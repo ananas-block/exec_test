@@ -29,7 +29,7 @@ describe("exec_test", () => {
       }
     ]
   };
-  const program = new Program(IDL, new solana.PublicKey("DzLsmqhzHC3U5pFS1vbUXZFRuTeTC9ZTjNcc3STRX5Va"));
+  const program = new Program(IDL, new solana.PublicKey("Esqmi51Gc2EGie1b3uGqZyqY86rakzCLk1gv4D9x2Lwp"));
 
   it("Is initialized!", async () => {
     // program.programId = new solana.PublicKey("DUUot4WvRmSkRgKmpm7VWgQMkNbqcNa9QLkNr7ueTio4");
@@ -42,10 +42,18 @@ describe("exec_test", () => {
     console.log("feePayerPda ", feePayerPda);
 
     // Add your test here.
-    const tx = await program.methods.initialize().accounts({
-    }).rpc();
-    console.log(tx);
-    console.log("Your transaction signature", tx);
+    try {
+      const tx = await program.methods.initialize().preInstructions([
+        solana.ComputeBudgetProgram.setComputeUnitLimit({ units: 1_400_000 }),
+      ]).accounts({
+      }).rpc();
+      console.log(tx);
+      console.log("Your transaction signature", tx);
+    } catch (error) {
+      console.log("error ", error);
+    }
+
+
   });
 });
 
