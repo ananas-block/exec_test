@@ -6,9 +6,10 @@ Error: ELF error: ELF error: Unresolved symbol (sol_alt_bn128_group_op) at instr
 
 ### To replicate the issue run:
 
-```solana-test-validator --reset```
+```solana-install init 1.16.3```
 
 ```anchor build```
 
+```solana-test-validator --reset```
 
 ```anchor deploy``` or ```solana program deploy target/deploy/exec_test.so```
