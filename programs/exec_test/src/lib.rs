@@ -1,11 +1,14 @@
 use anchor_lang::prelude::*;
-use solana_program::poseidon::hashv;
+use ark_bn254::Config;
+use ark_ff::{BigInteger, One};
+use ark_ff::{BigInteger256, MontConfig};
+use solana_program::poseidon::{hash, hashv};
 declare_id!("Esqmi51Gc2EGie1b3uGqZyqY86rakzCLk1gv4D9x2Lwp");
 
 pub struct PublicInput {
     pub input1: [[u8; 32]; 3],
 }
-use ark_bn254::Fr;
+use ark_bn254::{Fr, FrConfig};
 use ark_ff::PrimeField;
 #[program]
 pub mod exec_test {
@@ -13,34 +16,96 @@ pub mod exec_test {
 
     pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
         msg!("Hello world");
-        execute_poseidon()?;
+        // execute_poseidon()?;
+        // update_merkle_tree()?;
+        let value = [vec![0u8; 31], vec![1u8]].concat();
+        let hash_invalid_input = solana_program::poseidon::hash([1u8; 128].as_slice());
+        let hash1 = solana_program::poseidon::hash([1u8; 1].as_slice());
+
+        let hash32 = solana_program::poseidon::hash([1u8; 32].as_slice());
+
+        msg!("here");
+        let greater_than_field_size = Fr::from(FrConfig::MODULUS) + Fr::one();
+        msg!("greater_than_field_size");
+
+        let greater_than_field_size = greater_than_field_size.into_bigint().to_bytes_be();
+        msg!(
+            "greater_than_field_size bytes {:?}",
+            greater_than_field_size
+        );
+
+        // msg!("hash_invalid_input {:?}", hash_invalid_input.unwrap().0);
+        // msg!("hash1 {:?}", hash1.unwrap().0);
+        // msg!("hash32 {:?}", hash32.unwrap().0);
+        let hash = hash(greater_than_field_size.as_slice());
+
+        // assert!(hash_invalid_input.is_err());
+        panic!();
+        // let hash = hash([1; 1].as_slice());
+        // assert!(hash.is_err());
+        // let hash = hashv(&[[&[0u8]]]).unwrap();
 
         Ok(())
     }
 }
+
 fn execute_poseidon() -> Result<()> {
     msg!("execute_poseidon");
-    for i in 0..50 {
+    for _ in 0..200 {
         let mut inputs = Vec::new();
         let value = [vec![0u8; 31], vec![1u8]].concat();
         // inputs.push(value.as_slice());
         // Fr::from_be_bytes_mod_order(inputs[0]);
-        let hash = hashv(&[&value[..]]).unwrap();
-        msg!("here");
-        for i in 1..13 {
-            msg!("i {}", i);
+        // let hash = hashv(&[&value[..]]).unwrap();
+        // msg!("here");
+        for i in 2..3 {
+            // msg!("i {}", i);
             inputs.push(value.as_slice());
             let hash = hashv(inputs.as_slice()).unwrap();
             // assert_eq!(TEST_CASES[i - 1], hash.to_bytes());
         }
-        inputs.push(value.as_slice());
-        let hash = hashv(inputs.as_slice());
-        msg!("{:?}", hash);
-        assert!(hash.is_err());
+        // inputs.push(value.as_slice());
+        // let hash = hashv(inputs.as_slice());
+        // // msg!("{:?}", hash.0);
+        // assert!(hash.is_err());
     }
 
     Ok(())
 }
+
+//
+// use light_merkle_tree::{Hash, Hasher};
+
+// #[derive(Clone, Copy)] // To allow using with zero copy Solana accounts.
+// pub struct Poseidon;
+
+// impl Hasher for Poseidon {
+//     fn hash(val: &[u8]) -> Hash {
+//         unimplemented!()
+//     }
+
+//     fn hashv(vals: &[&[u8]]) -> Hash {
+//         hashv(vals).to_bytes()
+//     }
+// }
+// pub(crate) struct Sha256MerkleTreeConfig;
+// impl config::MerkleTreeConfig for Sha256MerkleTreeConfig {
+//     const ZERO_BYTES: constants::ZeroBytes = constants::poseidon::ZERO_BYTES;
+//     const PROGRAM_ID: Pubkey = Pubkey::new_from_array([0u8; 32]);
+// }
+// fn update_merkle_tree() -> Result<()> {
+
+//         let mut merkle_tree = MerkleTree::<
+//             light_merkle_tree::HashFunction::Poseidon,
+//             Sha256MerkleTreeConfig,
+//         >::new(18);
+//         merkle_tree.init(3, light_merkle_tree::HashFunction::Poseidon);
+//         merkle_tree
+
+//     // merkle_tree.init(18, HashFunction::Poseidon);
+//     // merkle_tree.insert(leaf_left, leaf_right);
+//     Ok(())
+// }
 #[derive(Accounts)]
 pub struct Initialize {
     // /// CHECK:` doc comment explaining why no checks through types are necessary.
@@ -120,4 +185,39 @@ const TEST_CASES: [[u8; 32]; 16] = [
 #[test]
 fn test_execute_poseidon() {
     execute_poseidon().unwrap();
+}
+
+#[test]
+fn test_greater_than_field_size() {
+    msg!("here");
+    let mut greater_than_field_size = FrConfig::MODULUS; //  + Fr::one()
+    msg!("greater_than_field_size");
+    BigInteger::sub_with_borrow(&mut greater_than_field_size, &BigInteger256::from(1u64));
+
+    msg!(
+        "greater_than_field_size bytes {:?}",
+        greater_than_field_size
+    );
+    let res = hash(greater_than_field_size.to_bytes_be().as_slice()).unwrap();
+    BigInteger::add_with_carry(&mut greater_than_field_size, &BigInteger256::from(10u64));
+    let hash = hash(greater_than_field_size.to_bytes_be().as_slice()).unwrap();
+
+    // msg!("hash_invalid_input {:?}", hash_invalid_input.unwrap().0);
+    // msg!("hash1 {:?}", hash1.unwrap().0);
+    // msg!("hash32 {:?}", hash32.unwrap().0);
+}
+
+fn maybe_get_value() -> Option<i32> {
+    None
+}
+
+fn another_function() -> Option<i32> {
+    let val = maybe_get_value();
+    val.unwrap(); // This will panic if `val` is `None`
+    None
+}
+
+#[test]
+fn unwrap_test() {
+    another_function();
 }
