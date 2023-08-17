@@ -36,6 +36,7 @@ describe("exec_test", () => {
     const signer = Keypair.generate();
     const feePayerPda = solana.PublicKey.findProgramAddressSync([signer.publicKey.toBuffer()], program.programId)[0]; //deriveProgramAddress()
     const provider = anchor.getProvider();
+    await provider.connection.confirmTransaction(await provider.connection.requestAirdrop(provider.publicKey, 1_000_000), "confirmed");
     await provider.connection.confirmTransaction(await provider.connection.requestAirdrop(feePayerPda, 1_000_000), "confirmed");
     await provider.connection.confirmTransaction(await provider.connection.requestAirdrop(signer.publicKey, 1_000_000), "confirmed");
     console.log("signer ", signer.publicKey);
@@ -44,7 +45,7 @@ describe("exec_test", () => {
     // Add your test here.
     try {
       const tx = await program.methods.initialize().preInstructions([
-        solana.ComputeBudgetProgram.setComputeUnitLimit({ units: 1_400_000 }),
+        solana.ComputeBudgetProgram.setComputeUnitLimit({ units: 1_200_000 }),
       ]).accounts({
       }).rpc();
       console.log(tx);
